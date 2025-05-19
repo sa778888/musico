@@ -1,34 +1,23 @@
 // app/layout.tsx
+import './globals.css'
+import Sidebar from './components/Sidebar'
+import PlayerWrapper from './components/PlayerWrapper'
 import './globals.css';
-import Sidebar from './components/Sidebar';
-import Player from './components/Player';
-import { Figtree } from 'next/font/google';
-
-const font = Figtree({ subsets: ['latin'] });
-
-export const metadata = {
-  title: 'Music Explorer',
-  description: 'Your personal music discovery app',
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${font.className} bg-black h-full overflow-hidden`}>
-        <main className="h-screen overflow-hidden flex">
-          <Sidebar />
-          <div className="flex-1 h-full overflow-y-auto bg-gradient-to-b from-[#121212] to-black pt-2">
-            <div className="px-6">
-              {children}
-            </div>
-          </div>
+      <body className="flex bg-black text-white h-screen overflow-hidden">
+        {/* Sidebar */}
+        {/* <Sidebar /> */}
+
+        {/* Main content: scrollable, padded at bottom so it never hides under the player */}
+        <main className="flex-1 overflow-y-auto pb-24">
+          {children}
         </main>
-        <Player />
+
+        {/* Player always mounted and fixed to bottom */}
+        <PlayerWrapper />
       </body>
     </html>
-  );
+  )
 }

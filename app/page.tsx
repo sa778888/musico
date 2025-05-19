@@ -1,6 +1,6 @@
 // app/page.tsx
 'use client';
-
+import './globals.css';
 import MusicSearch from './components/MusicSearch';
 import { useEffect, useState } from 'react';
 
