@@ -4,8 +4,17 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'is1-ssl.mzstatic.com',
+        port: '',
+        pathname: '/image/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'lastfm.freetls.fastly.net',
         pathname: '/**',
+      },{
+        protocol: 'https',
+        hostname: 'www.theaudiodb.com',
       },
     ],
   },
