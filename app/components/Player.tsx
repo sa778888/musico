@@ -1,7 +1,6 @@
-// app/components/Player.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player/youtube';
 import {
   Shuffle,
@@ -20,6 +19,10 @@ export default function Player() {
   const [videoId, setVideoId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
+  const [played, setPlayed] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [seeking, setSeeking] = useState(false);
+  const playerRef = useRef<ReactPlayer>(null);
 
   // listen for global playTrack event
   useEffect(() => {
@@ -31,6 +34,42 @@ export default function Player() {
     window.addEventListener('playTrack', handler as any);
     return () => window.removeEventListener('playTrack', handler as any);
   }, []);
+
+  // Format seconds to MM:SS
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  // Handle player progress updates
+  const handleProgress = (state: { played: number; playedSeconds: number }) => {
+    if (!seeking) {
+      setPlayed(state.played);
+    }
+  };
+
+  // Handle duration update
+  const handleDuration = (duration: number) => {
+    setDuration(duration);
+  };
+
+  // Seek bar handlers
+  const handleSeekMouseDown = () => {
+    setSeeking(true);
+  };
+
+  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPlayed(parseFloat(e.target.value));
+  };
+
+  const handleSeekMouseUp = () => {
+    setSeeking(false);
+    if (playerRef.current) {
+      playerRef.current.seekTo(played);
+    }
+  };
 
   if (!currentTrack || !videoId) return null;
 
@@ -73,6 +112,44 @@ export default function Player() {
             <SkipForward className="h-6 w-6 text-neutral-400 hover:text-white" />
             <Repeat className="h-5 w-5 text-neutral-400 hover:text-white" />
           </div>
+
+          {/* Seek Bar */}
+          <div className="flex items-center gap-2 w-full mt-2">
+            <span className="text-xs text-neutral-400 w-10">
+              {formatTime(played * duration)}
+            </span>
+            <div className="relative flex-grow h-1 group">
+              <input
+                type="range"
+                min={0}
+                max={0.999999}
+                step="any"
+                value={played}
+                onMouseDown={handleSeekMouseDown}
+                onChange={handleSeekChange}
+                onMouseUp={handleSeekMouseUp}
+                onTouchStart={handleSeekMouseDown}
+                onTouchEnd={handleSeekMouseUp}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              />
+              <div className="absolute inset-0 rounded-lg bg-neutral-600">
+                <div
+                  className="h-full bg-white rounded-lg"
+                  style={{ width: `${played * 100}%` }}
+                />
+              </div>
+              <div
+                className="absolute h-3 w-3 bg-white rounded-full opacity-0 group-hover:opacity-100 -translate-y-1 shadow-md"
+                style={{
+                  left: `${played * 100}%`,
+                  transform: `translateX(-50%) translateY(-25%)`,
+                }}
+              />
+            </div>
+            <span className="text-xs text-neutral-400 w-10">
+              {formatTime(duration)}
+            </span>
+          </div>
         </div>
 
         {/* Volume Control */}
@@ -106,11 +183,14 @@ export default function Player() {
 
       {/* Hidden YouTube Player */}
       <ReactPlayer
+        ref={playerRef}
         url={`https://www.youtube.com/watch?v=${videoId}`}
         playing={isPlaying}
         volume={volume}
         width="0"
         height="0"
+        onProgress={handleProgress}
+        onDuration={handleDuration}
         config={{
           youtube: { playerVars: { controls: 0, disablekb: 1 } },
         }}
