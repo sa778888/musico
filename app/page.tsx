@@ -1,67 +1,80 @@
-// app/page.tsx
 'use client';
+
 import './globals.css';
 import MusicSearch from './components/MusicSearch';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import TopSongs from './components/TopSongs';
 
 export default function Home() {
   const [greeting, setGreeting] = useState('Good morning');
-  
+  const router = useRouter();
+
   useEffect(() => {
-    const getTimeBasedGreeting = () => {
-      const hour = new Date().getHours();
-      if (hour < 12) return 'Good morning';
-      if (hour < 18) return 'Good afternoon';
-      return 'Good evening';
-    };
-    
-    setGreeting(getTimeBasedGreeting());
+    const hour = new Date().getHours();
+    setGreeting(
+      hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+    );
   }, []);
 
   return (
-    <div className="pb-10">
-      <h1 className="text-white text-3xl font-bold mt-10 mb-6">
-        {greeting}
-      </h1>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-r from-neutral-800 to-neutral-700 group flex items-center gap-x-4 rounded-md overflow-hidden hover:bg-neutral-700/50 transition cursor-pointer p-3">
-          <div className="relative min-h-[64px] min-w-[64px]">
-            <img 
-              src="/liked-songs.png" 
-              alt="Liked Songs" 
-              className="object-cover h-full w-full"
-            />
-          </div>
-          <p className="font-medium truncate text-white">Liked Songs</p>
-        </div>
-        <div className="bg-gradient-to-r from-neutral-800 to-neutral-700 group flex items-center gap-x-4 rounded-md overflow-hidden hover:bg-neutral-700/50 transition cursor-pointer p-3">
-          <div className="relative min-h-[64px] min-w-[64px]">
-            <img 
-              src="/albums.png" 
-              alt="Top Albums" 
-              className="object-cover h-full w-full"
-            />
-          </div>
-          <p className="font-medium truncate text-white">Top Albums</p>
-        </div>
-        <div className="bg-gradient-to-r from-neutral-800 to-neutral-700 group flex items-center gap-x-4 rounded-md overflow-hidden hover:bg-neutral-700/50 transition cursor-pointer p-3">
-          <div className="relative min-h-[64px] min-w-[64px]">
-            <img 
-              src="/discover.png" 
-              alt="Discover" 
-              className="object-cover h-full w-full"
-            />
-          </div>
-          <p className="font-medium truncate text-white">Discover Weekly</p>
-        </div>
+    <div className="px-6 py-8">
+      <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">{greeting}</h1>
+
+      {/* Shortcut Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mb-10">
+        <Card
+          title="Liked Songs"
+          image="/liked-songs.png"
+          onClick={() => router.push('/liked')}
+          gradient="from-purple-600 via-pink-500 to-red-400"
+        />
+        <Card
+          title="Top Albums"
+          image="/albums.png"
+          onClick={() => router.push('/albums')}
+          gradient="from-indigo-500 to-blue-600"
+        />
+        <Card
+          title="Top Artists"
+          image="/discover.png"
+          onClick={() => router.push('/artists')}
+          gradient="from-green-400 to-teal-500"
+        />
       </div>
-      
-      <h2 className="text-2xl font-bold text-white mb-6">
-        Search for music
-      </h2>
-      
-      <MusicSearch />
+
+      {/* Search Section */}
+      <h2 className="text-2xl font-bold text-white mb-6">Search for music</h2>
+      <div className="bg-neutral-800 p-4 rounded-lg mb-10">
+        <MusicSearch />
+      </div>
+
+      {/* Top Songs Section */}
+      <TopSongs />
+    </div>
+  );
+}
+
+function Card({
+  title,
+  image,
+  onClick,
+  gradient,
+}: {
+  title: string;
+  image: string;
+  onClick: () => void;
+  gradient: string;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      className={`cursor-pointer group transition transform hover:scale-[1.03] hover:shadow-lg rounded-xl overflow-hidden bg-gradient-to-br ${gradient}`}
+    >
+      <div className="flex items-center gap-4 p-4">
+        <img src={image} alt={title} className="h-16 w-16 object-cover rounded-md" />
+        <p className="text-white font-semibold truncate">{title}</p>
+      </div>
     </div>
   );
 }

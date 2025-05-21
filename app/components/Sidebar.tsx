@@ -1,8 +1,7 @@
-// app/components/Sidebar.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Home, Search, Library, PlusSquare, Heart } from 'lucide-react';
+import { useState } from 'react';
+import { Home, Search, Library, PlusSquare, Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Sidebar() {
@@ -10,63 +9,92 @@ export default function Sidebar() {
     { id: '1', name: 'Chill Vibes' },
     { id: '2', name: 'Workout Mix' },
     { id: '3', name: 'Study Focus' },
+    { id: '4', name: 'Jazz & Blues' },
+    { id: '5', name: 'Coding Flow' },
+    { id: '6', name: 'Evening Relax' },
+    { id: '7', name: 'Party Hits' },
   ]);
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    });
+    window.location.href = '/login';
+  };
+
   return (
-    <div className="hidden md:flex flex-col bg-black w-[300px] p-2">
-      <div className="flex flex-col gap-y-4 px-5 py-4">
-        <Link href="/" className="flex items-center gap-x-4 text-white">
-          <svg viewBox="0 0 1134 340" className="h-10 w-28">
-            <title>Music Explorer</title>
-            <path fill="currentColor" d="M8 171.4c0 7 5.7 12.7 12.7 12.7h109.7c7 0 12.7-5.7 12.7-12.7s-5.7-12.7-12.7-12.7H20.7c-7 0-12.7 5.7-12.7 12.7zM20.7 85.9h109.7c7 0 12.7-5.7 12.7-12.7s-5.7-12.7-12.7-12.7H20.7C13.7 60.5 8 66.2 8 73.2s5.7 12.7 12.7 12.7zM20.7 243.2h109.7c7 0 12.7-5.7 12.7-12.7s-5.7-12.7-12.7-12.7H20.7c-7 0-12.7 5.7-12.7 12.7s5.7 12.7 12.7 12.7z"></path>
-          </svg>
+    <aside className="hidden md:flex flex-col h-screen w-[280px] bg-black text-neutral-400 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+      {/* Top Navigation */}
+      <div className="flex flex-col gap-4">
+        {/* Logo */}
+        <Link href="/" className="text-white font-bold text-xl px-2">
+          Spotify Clone
         </Link>
-        <div className="flex flex-col gap-y-4 mt-2">
-          <Link href="/" className="flex items-center gap-x-4 text-white hover:text-white transition">
-            <Home className="h-6 w-6" />
-            <p className="font-bold">Home</p>
+
+        {/* Home and Search */}
+        <nav className="flex flex-col gap-2 mt-6">
+          <Link
+            href="/"
+            className="flex items-center gap-4 px-2 py-2 rounded-md hover:bg-neutral-800 text-white"
+          >
+            <Home className="h-5 w-5" />
+            <span className="text-sm font-semibold">Home</span>
           </Link>
-          <Link href="/search" className="flex items-center gap-x-4 text-neutral-400 hover:text-white transition">
-            <Search className="h-6 w-6" />
-            <p className="font-medium">Search</p>
+          <Link
+            href="/search"
+            className="flex items-center gap-4 px-2 py-2 rounded-md hover:bg-neutral-800"
+          >
+            <Search className="h-5 w-5" />
+            <span className="text-sm font-medium">Search</span>
           </Link>
-        </div>
+        </nav>
       </div>
-      <div className="flex flex-col gap-y-2 px-5 py-4 border-t border-neutral-800">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-x-2 text-neutral-400 hover:text-white cursor-pointer transition">
-            <Library className="h-6 w-6" />
-            <p className="font-medium">Your Library</p>
+
+      {/* Library Section */}
+      <div className="mt-8 border-t border-neutral-800 pt-4">
+        <div className="flex items-center justify-between px-2 text-sm mb-4">
+          <div className="flex items-center gap-2 hover:text-white cursor-pointer transition">
+            <Library className="h-5 w-5" />
+            <span className="font-medium">Your Library</span>
           </div>
-          <PlusSquare className="h-5 w-5 text-neutral-400 hover:text-white cursor-pointer transition" />
+          <PlusSquare className="h-5 w-5 cursor-pointer hover:text-white transition" />
         </div>
-        <div className="flex flex-col gap-y-2 mt-4">
-          <div className="bg-neutral-900 rounded-md p-4">
-            <h2 className="text-white font-bold mb-2">Create your first playlist</h2>
-            <p className="text-neutral-400 text-sm mb-4">It's easy, we'll help you</p>
-            <button className="bg-white text-black font-bold text-sm py-1 px-3 rounded-full hover:scale-105 transition">
-              Create playlist
-            </button>
+
+        {/* Liked Songs */}
+        <Link
+          href="/liked"
+          className="flex items-center gap-4 px-2 py-2 mb-2 rounded-md hover:bg-neutral-800"
+        >
+          <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-2 rounded-sm">
+            <Heart className="h-4 w-4 text-white fill-white" />
           </div>
-          <div className="bg-neutral-900 rounded-md p-4 mt-2">
-            <h2 className="text-white font-bold mb-2">Let's find some songs</h2>
-            <p className="text-neutral-400 text-sm mb-4">Start by searching for music you love</p>
-            <button className="bg-white text-black font-bold text-sm py-1 px-3 rounded-full hover:scale-105 transition">
-              Browse music
-            </button>
-          </div>
-        </div>
-        <div className="mt-6 space-y-2">
+          <span className="text-sm text-white font-medium">Liked Songs</span>
+        </Link>
+
+        {/* Playlist List */}
+        <div className="mt-6 flex flex-col gap-2 text-sm">
           {playlists.map((playlist) => (
-            <div 
-              key={playlist.id} 
-              className="flex items-center gap-x-3 cursor-pointer hover:text-white text-neutral-400 transition"
+            <p
+              key={playlist.id}
+              className="px-2 py-1 cursor-pointer truncate hover:text-white transition"
             >
-              <p className="truncate">{playlist.name}</p>
-            </div>
+              {playlist.name}
+            </p>
           ))}
         </div>
       </div>
-    </div>
+
+      {/* Logout Button */}
+      <div className="mt-auto border-t border-neutral-800 pt-4 px-2">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 text-red-500 hover:text-red-700 transition"
+        >
+          <LogOut className="h-5 w-5" />
+          <span className="text-sm font-medium">Logout</span>
+        </button>
+      </div>
+    </aside>
   );
 }
