@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    // Hot tracks is another label for popular songs
     const response = await fetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json');
     if (!response.ok) throw new Error(`iTunes API error: ${response.status}`);
     
@@ -20,7 +21,7 @@ export async function GET() {
 
     return NextResponse.json(songs);
   } catch (error) {
-    console.error('Failed to fetch top songs:', error);
+    console.error('Failed to fetch hot tracks:', error);
     return NextResponse.json([], { status: 500 });
   }
 }

@@ -29,7 +29,7 @@ export default function Sidebar() {
       <div className="flex flex-col gap-4">
         {/* Logo */}
         <Link href="/" className="text-white font-bold text-xl px-2">
-          Spotify Clone
+          Musico
         </Link>
 
         {/* Home and Search */}
@@ -58,7 +58,7 @@ export default function Sidebar() {
             <Library className="h-5 w-5" />
             <span className="font-medium">Your Library</span>
           </div>
-          <PlusSquare className="h-5 w-5 cursor-pointer hover:text-white transition" />
+          {/* <PlusSquare className="h-5 w-5 cursor-pointer hover:text-white transition" /> */}
         </div>
 
         {/* Liked Songs */}
@@ -73,19 +73,7 @@ export default function Sidebar() {
         </Link>
 
         {/* Playlist List */}
-        <div className="mt-6 flex flex-col gap-2 text-sm">
-          {playlists.map((playlist) => (
-            <p
-              key={playlist.id}
-              className="px-2 py-1 cursor-pointer truncate hover:text-white transition"
-            >
-              {playlist.name}
-            </p>
-          ))}
-        </div>
-      </div>
-
-      {/* Logout Button */}
+        
       <div className="mt-auto border-t border-neutral-800 pt-4 px-2">
         <button
           onClick={handleLogout}
@@ -95,6 +83,9 @@ export default function Sidebar() {
           <span className="text-sm font-medium">Logout</span>
         </button>
       </div>
+      </div>
+
+      {/* Logout Button */}
     </aside>
   );
 }

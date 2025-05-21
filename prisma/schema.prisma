@@ -21,6 +21,7 @@ model Song {
   artist      String
   thumbnail   String
   likedBy     LikedSong[]
+  playlists   PlaylistSong[]
 }
 
 model LikedSong {
@@ -31,4 +32,26 @@ model LikedSong {
   likedAt DateTime @default(now())
 
   @@id([userId, songId])
+}
+
+model Playlist {
+  id        String        @id @default(cuid())
+  name      String
+  userId    String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  songs     PlaylistSong[]
+
+  @@index([userId])
+}
+
+model PlaylistSong {
+  playlistId String
+  songId     String
+  createdAt  DateTime @default(now())
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song       Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@id([playlistId, songId])
+  @@index([songId])
 }

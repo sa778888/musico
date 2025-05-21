@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    const response = await fetch('https://itunes.apple.com/us/rss/topalbums/limit=20/json');
+    const response = await fetch('https://itunes.apple.com/us/rss/topalbums/limit=40/json');
     const data = await response.json();
 
     const albums = data.feed.entry.map((entry: any) => ({

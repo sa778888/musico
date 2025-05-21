@@ -17,14 +17,14 @@ export interface LastFMTrack {
 
 export async function searchTracks(
   query: string,
-  limit = 20
+  limit = 20,
+  page = 1
 ): Promise<LastFMTrack[]> {
   if (!query) return [];
 
-  // 1) Fetch LastFM search
   const res = await fetch(
     `${BASE_URL}?method=track.search&track=${encodeURIComponent(query)}` +
-    `&api_key=${API_KEY}&format=json&limit=${limit}`
+    `&api_key=${API_KEY}&format=json&limit=${limit}&page=${page}`
   );
   if (!res.ok) {
     console.error('LastFM error', res.status);

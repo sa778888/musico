@@ -1,4 +1,3 @@
-// app/components/TopSongs.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,29 +14,30 @@ interface Song {
   itunesId: string;
 }
 
+const PAGE_SIZE = 20;
+
 export default function TopSongs() {
-  const [songs, setSongs] = useState<Song[]>([]);
+  const [allSongs, setAllSongs] = useState<Song[]>([]);
+  const [visibleSongs, setVisibleSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   const { toggleLike, isLiked } = useLikedSongs();
 
-  // Fetch top songs from iTunes
   useEffect(() => {
     async function fetchTopSongs() {
       try {
-        const response = await fetch('https://itunes.apple.com/us/rss/topsongs/limit=20/json');
+        const response = await fetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json');
         const data = await response.json();
-        
-        // Process and enhance each song
-        const songsPromises = data.feed.entry.map(async (entry: any, index: number) => {
+
+        const songsPromises = data.feed.entry.map(async (entry: any) => {
           const artist = entry['im:artist'].label;
           const title = entry['im:name'].label;
           const itunesId = entry.id.attributes['im:id'];
-          
-          // Get high-quality artwork
+
           const artwork = await fetchCoverWithItunes(artist, title);
-          
+
           return {
             itunesId,
             title,
@@ -45,9 +45,10 @@ export default function TopSongs() {
             thumbnail: artwork,
           };
         });
-        
+
         const enhancedSongs = await Promise.all(songsPromises);
-        setSongs(enhancedSongs);
+        setAllSongs(enhancedSongs);
+        setVisibleSongs(enhancedSongs.slice(0, PAGE_SIZE));
       } catch (err) {
         console.error('Failed to fetch top songs:', err);
         setError('Could not load top songs');
@@ -55,39 +56,33 @@ export default function TopSongs() {
         setLoading(false);
       }
     }
-    
+
     fetchTopSongs();
   }, []);
 
-  // Handle play button click
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    setTimeout(() => {
+      const nextSongs = allSongs.slice(visibleSongs.length, visibleSongs.length + PAGE_SIZE);
+      setVisibleSongs(prev => [...prev, ...nextSongs]);
+      setLoadingMore(false);
+    }, 300); // simulate slight delay
+  };
+
   const handlePlay = async (song: Song, index: number) => {
     setPlayingIndex(index);
-    
+
     try {
-      // Find YouTube equivalent
       const videoId = await getYoutubeVideoId(song.artist, song.title);
-      
-      if (!videoId) {
-        throw new Error('No video found');
-      }
-      
-      // Prepare song data for player
-      const trackToPlay = {
-        title: song.title,
-        artist: song.artist,
-        thumbnail: song.thumbnail,
-        videoId: videoId
-      };
-      
-      // Dispatch event to play the track
+      if (!videoId) throw new Error('No video found');
+
       const event = new CustomEvent('playTrack', {
         detail: {
-          track: trackToPlay,
-          videoId: videoId
+          track: { ...song, videoId },
+          videoId,
         }
       });
       window.dispatchEvent(event);
-      
     } catch (err) {
       console.error('Error playing track:', err);
       alert('Could not play this track. Please try another.');
@@ -96,36 +91,34 @@ export default function TopSongs() {
     }
   };
 
-  // Handle like button click
   const handleLike = (song: Song) => {
-    const songWithVideoId = {
-      ...song,
-      videoId: song.videoId || song.itunesId // Use videoId if available, otherwise itunesId
-    };
+    const songWithVideoId = { ...song, videoId: song.videoId || song.itunesId };
     toggleLike(songWithVideoId);
   };
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center h-96 text-white animate-pulse space-y-4">
-      <Loader2 className="animate-spin w-8 h-8 text-green-500" />
-      <p className="text-lg">Fetching the top songs...</p>
-    </div>
-  );
-  
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 text-white animate-pulse space-y-4">
+        <Loader2 className="animate-spin w-8 h-8 text-green-500" />
+        <p className="text-lg">Fetching the top songs...</p>
+      </div>
+    );
+  }
+
   if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6 text-white">Top Songs</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {songs.map((song, index) => (
-          <div 
+        {visibleSongs.map((song, index) => (
+          <div
             key={song.itunesId}
             className="bg-neutral-800 p-4 rounded-md hover:bg-neutral-700 transition group"
           >
             <div className="relative aspect-square mb-4">
-              <img 
-                src={song.thumbnail} 
+              <img
+                src={song.thumbnail}
                 alt={`${song.title} by ${song.artist}`}
                 className="object-cover w-full h-full rounded-md"
               />
@@ -151,11 +144,11 @@ export default function TopSongs() {
                 className="transition mt-1"
                 aria-label={`Like ${song.title}`}
               >
-                <Heart 
+                <Heart
                   size={18}
                   className={`hover:scale-110 transition ${
-                    isLiked(song.videoId || song.itunesId) 
-                      ? 'text-green-500 fill-green-500' 
+                    isLiked(song.videoId || song.itunesId)
+                      ? 'text-green-500 fill-green-500'
                       : 'text-white'
                   }`}
                 />
@@ -164,6 +157,18 @@ export default function TopSongs() {
           </div>
         ))}
       </div>
+
+      {visibleSongs.length < allSongs.length && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="px-6 py-3 text-black font-semibold rounded-full bg-green-500 hover:bg-green-400 transition disabled:opacity-60"
+          >
+            {loadingMore ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

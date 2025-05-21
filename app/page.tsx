@@ -13,13 +13,13 @@ export default function Home() {
   useEffect(() => {
     const hour = new Date().getHours();
     setGreeting(
-      hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+      hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening'
     );
   }, []);
 
   return (
     <div className="px-6 py-8">
-      <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">{greeting}</h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">YO {greeting}</h1>
 
       {/* Shortcut Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mb-10">
@@ -45,7 +45,7 @@ export default function Home() {
 
       {/* Search Section */}
       <h2 className="text-2xl font-bold text-white mb-6">Search for music</h2>
-      <div className="bg-neutral-800 p-4 rounded-lg mb-10">
+      <div className="bg-neutral-800 p-4 rounded-lg mb-10 ">
         <MusicSearch />
       </div>
 
