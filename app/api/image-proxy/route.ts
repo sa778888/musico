@@ -10,10 +10,26 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Missing URL parameter', { status: 400 });
     }
 
-    console.log('Fetching image:', imageUrl);
+    console.log('Fetching image for base64 conversion:', imageUrl);
 
-    // Fetch the actual image
-    const imageResponse = await fetch(imageUrl, {
+    // Validate URL
+    const url = new URL(imageUrl);
+    const allowedHosts = [
+      'is1-ssl.mzstatic.com',
+      'is2-ssl.mzstatic.com',
+      'is3-ssl.mzstatic.com',
+      'is4-ssl.mzstatic.com',
+      'is5-ssl.mzstatic.com',
+      'lastfm.freetls.fastly.net',
+      'i.ytimg.com'
+    ];
+
+    if (!allowedHosts.includes(url.hostname)) {
+      return new NextResponse('Domain not allowed', { status: 403 });
+    }
+
+    // Fetch the image
+    const response = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
@@ -21,35 +37,48 @@ export async function GET(request: NextRequest) {
         'Sec-Fetch-Dest': 'image',
         'Sec-Fetch-Mode': 'no-cors',
         'Sec-Fetch-Site': 'cross-site'
-      }
+      },
+      signal: AbortSignal.timeout(10000) // 10 second timeout
     });
 
-    if (!imageResponse.ok) {
-      console.error('Failed to fetch image:', imageResponse.status, imageResponse.statusText);
-      return new NextResponse('Failed to fetch image', { status: imageResponse.status });
+    if (!response.ok) {
+      console.error('Failed to fetch image:', response.status, response.statusText);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    // Get the image data
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-
-    console.log('Image fetched successfully:', {
+    // Convert to base64
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString('base64');
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    
+    console.log('Image converted to base64:', {
       contentType,
-      size: imageBuffer.byteLength
+      originalSize: arrayBuffer.byteLength,
+      base64Size: base64.length
     });
 
-    // Return the image with proper headers
-    return new NextResponse(imageBuffer, {
-      status: 200,
+    // Return as data URL
+    const dataUrl = `data:${contentType};base64,${base64}`;
+    
+    return new NextResponse(dataUrl, {
       headers: {
-        'Content-Type': contentType,
+        'Content-Type': 'text/plain',
         'Cache-Control': 'public, max-age=86400',
         'Access-Control-Allow-Origin': '*'
       }
     });
 
   } catch (error) {
-    console.error('Image proxy error:', error);
-    return new NextResponse('Internal server error', { status: 500 });
+    console.error('Base64 image proxy error:', error);
+    
+    // Return a default base64 image (1x1 transparent pixel)
+    const defaultBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    
+    return new NextResponse(defaultBase64, {
+      headers: {
+        'Content-Type': 'text/plain',
+        'Cache-Control': 'public, max-age=60'
+      }
+    });
   }
 }
