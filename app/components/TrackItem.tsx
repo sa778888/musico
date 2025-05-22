@@ -45,10 +45,8 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       return '/default-cover.png';
     }
     
-    // Use proxy in production for external images
-    if (process.env.NODE_ENV === 'production' && 
-        thumbnail.startsWith('http') && 
-        !thumbnail.includes('localhost')) {
+    if(thumbnail){
+      console.log(`ThumbnailRL: ${thumbnail}`);
       return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
     }
     

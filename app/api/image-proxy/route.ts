@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     
     return new Response(imageBuffer, {
       headers: {
-        'Content-Type': response.headers.get('Content-Type') || 'image/jpeg',
+        'Content-Type': response.headers.get('Content-Type') || 'image/png',
         'Cache-Control': 'public, max-age=86400'
       }
     });
