@@ -2,81 +2,71 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const imageUrl = searchParams.get('url');
+  
+  if (!imageUrl) {
+    return new NextResponse('Missing URL parameter', { status: 400 });
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const imageUrl = searchParams.get('url');
+    console.log('Proxying image:', imageUrl);
     
-    if (!imageUrl) {
-      return new NextResponse('Missing URL parameter', { status: 400 });
+    // Special handling for iTunes/Apple images
+    const headers: Record<string, string> = {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      'Accept': 'image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Sec-Fetch-Dest': 'image',
+      'Sec-Fetch-Mode': 'no-cors',
+      'Sec-Fetch-Site': 'cross-site'
+    };
+
+    // For iTunes images, add referer
+    if (imageUrl.includes('mzstatic.com')) {
+      headers['Referer'] = 'https://music.apple.com/';
     }
 
-    console.log('Fetching image for base64 conversion:', imageUrl);
-
-    // Validate URL
-    const url = new URL(imageUrl);
-    const allowedHosts = [
-      'is1-ssl.mzstatic.com',
-      'is2-ssl.mzstatic.com',
-      'is3-ssl.mzstatic.com',
-      'is4-ssl.mzstatic.com',
-      'is5-ssl.mzstatic.com',
-      'lastfm.freetls.fastly.net',
-      'i.ytimg.com'
-    ];
-
-    if (!allowedHosts.includes(url.hostname)) {
-      return new NextResponse('Domain not allowed', { status: 403 });
-    }
-
-    // Fetch the image
     const response = await fetch(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-        'Referer': 'https://music.apple.com/',
-        'Sec-Fetch-Dest': 'image',
-        'Sec-Fetch-Mode': 'no-cors',
-        'Sec-Fetch-Site': 'cross-site'
-      },
+      headers,
       signal: AbortSignal.timeout(10000) // 10 second timeout
     });
-
+    
     if (!response.ok) {
-      console.error('Failed to fetch image:', response.status, response.statusText);
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.error(`Image fetch failed: ${response.status} ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}`);
     }
-
-    // Convert to base64
-    const arrayBuffer = await response.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString('base64');
-    const contentType = response.headers.get('content-type') || 'image/jpeg';
     
-    console.log('Image converted to base64:', {
-      contentType,
-      originalSize: arrayBuffer.byteLength,
-      base64Size: base64.length
-    });
-
-    // Return as data URL
-    const dataUrl = `data:${contentType};base64,${base64}`;
+    const contentType = response.headers.get('Content-Type');
+    if (!contentType?.startsWith('image/')) {
+      throw new Error('Response is not an image');
+    }
     
-    return new NextResponse(dataUrl, {
+    const imageBuffer = await response.arrayBuffer();
+    console.log(`Successfully proxied image: ${imageBuffer.byteLength} bytes`);
+    
+    return new NextResponse(imageBuffer, {
       headers: {
-        'Content-Type': 'text/plain',
-        'Cache-Control': 'public, max-age=86400',
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
       }
     });
-
+    
   } catch (error) {
-    console.error('Base64 image proxy error:', error);
+    console.error('Image proxy error for URL:', imageUrl, error);
     
-    // Return a default base64 image (1x1 transparent pixel)
-    const defaultBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    // Return default image as base64
+    const defaultImageBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const defaultImage = Buffer.from(defaultImageBase64, 'base64');
     
-    return new NextResponse(defaultBase64, {
+    return new NextResponse(defaultImage, {
       headers: {
-        'Content-Type': 'text/plain',
+        'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=60'
       }
     });
