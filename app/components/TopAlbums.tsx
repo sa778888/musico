@@ -5,7 +5,6 @@ import { Play, Heart, Loader2, ArrowLeft } from 'lucide-react';
 import { useLikedSongs } from '@/app/context/LikedSongsContext';
 import { getYoutubeVideoId } from '@/app/lib/youtubeSearch';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 interface Album {
   id: string;
