@@ -74,7 +74,6 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
             className="object-cover rounded w-full h-full"
             sizes="40px"
           />
-        {thumbnail}
         </div>
         <div className="flex flex-col overflow-hidden">
           <p className="text-white truncate">{title}</p>
