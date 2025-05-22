@@ -45,8 +45,8 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       return '/default-cover.png';
     }
     
-    // Always use proxy for external images to avoid CORS issues
-    if (thumbnail.startsWith('http')) {
+    if(thumbnail){
+      console.log(`${thumbnail}`);
       return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
     }
     
@@ -79,20 +79,14 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       </div>
       
       <div className="flex items-center gap-x-3">
-        <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded">
-          <Image
-            src={getImageSrc()}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="40px"
-            onError={(e) => {
-              console.error(`Image failed for ${title}:`, thumbnail);
-              setImageError(true);
-            }}
-            onLoad={() => setImageError(false)}
-            unoptimized={process.env.NODE_ENV === 'development'}
-          />
+        <div className="relative h-10 w-10 flex-shrink-0">
+        <img
+  src={getImageSrc()}
+  alt={title}
+  className="object-cover rounded w-full h-full"
+  onError={() => setImageError(true)}
+  onLoad={() => setImageError(false)}
+/>
         </div>
         <div className="flex flex-col overflow-hidden">
           <p className="text-white truncate">{title}</p>
