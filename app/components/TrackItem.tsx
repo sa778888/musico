@@ -71,7 +71,7 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
             src={thumbnail || '/default-cover.png'}
             fill
             alt={title}
-            className="object-cover rounded"
+            className="object-cover rounded w-full h-full"
             sizes="40px"
           />
         </div>
