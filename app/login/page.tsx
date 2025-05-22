@@ -19,21 +19,22 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
-      if (!res.ok) {
-        let errorMessage = 'Login failed'
-  
-        try {
-          const data = await res.json()
-          errorMessage = data.error || errorMessage
-          window.location.href = '/'
+       if (!res.ok) {
+        window.location.href = '/'
 
-        } catch (_) {
-          // The response wasn't JSON — ignore
-        }
-  
-        throw new Error(errorMessage)
+      let errorMessage = 'Welcome'
+
+      try {
+        const data = await res.json()
+        errorMessage = data.error || errorMessage
+      } catch (_) {
+        // The response wasn't JSON — ignore
       }
   
+
+      throw new Error(errorMessage)
+    }
+
 
       window.location.href = '/'
     } catch (err) {
