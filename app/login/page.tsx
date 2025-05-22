@@ -24,7 +24,7 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed')
       }
 
-      window.location.href = '/'
+      window.location.href = 'https://musico-eight.vercel.app/'
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
     }
