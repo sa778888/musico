@@ -31,6 +31,7 @@ const nextConfig = {eslint: {
       'is3-ssl.mzstatic.com',
       'is4-ssl.mzstatic.com',
       'is5-ssl.mzstatic.com',
+        'lastfm.freetls.fastly.net',
       'via.placeholder.com'
     ],
   },
