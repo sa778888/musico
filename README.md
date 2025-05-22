@@ -1,4 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎵 Musico – Free Song Streaming App
+
+Musico is a **free and open-source music streaming app** that allows users to search, stream, and enjoy their favorite tracks seamlessly. Powered by YouTube, this app brings a simple and clean user experience, delivering high-quality music playback with minimal setup.
+
+---
+visit at : https://musico-eight.vercel.app/
+## 🚀 Features
+
+- 🔍 **Search for Songs** by title and artist  
+- ▶️ **Stream Music** directly from YouTube  
+- 🖼️ Dynamic **thumbnails and metadata** for tracks  
+- 🎧 Listener count display  
+- 📱 Fully responsive design  
+- 📦 Easily exportable to a mobile app via Capacitor
+
+---
+
+## 🛠️ Tech Stack
+
+- **Next.js** (App Router)
+- **TailwindCSS**
+- **Lucide React Icons**
+- **YouTube Data API**
+- **TypeScript**
+
+---
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/sa778888/musico.git
+cd musico
+npm install
+npm run dev
 
 ## Getting Started
 
