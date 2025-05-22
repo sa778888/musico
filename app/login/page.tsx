@@ -22,7 +22,7 @@ export default function LoginPage() {
        if (!res.ok) {
         window.location.href = '/'
 
-      let errorMessage = 'Login failed'
+      let errorMessage = 'Welcome'
 
       try {
         const data = await res.json()
