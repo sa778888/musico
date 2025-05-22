@@ -46,7 +46,7 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
     }
     
     if(thumbnail){
-      console.log(`ThumbnailRL: ${thumbnail}`);
+      console.log(`${thumbnail}`);
       return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
     }
     
