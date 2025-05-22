@@ -19,12 +19,21 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
-      if (!res.ok) {
+       if (!res.ok) {
+      let errorMessage = 'Login failed'
+
+      try {
         const data = await res.json()
-        throw new Error(data.error || 'Login failed')
+        errorMessage = data.error || errorMessage
+      } catch (_) {
+        // The response wasn't JSON — ignore
       }
 
-      window.location.href = 'https://musico-eight.vercel.app/'
+      throw new Error(errorMessage)
+    }
+
+
+      window.location.href = '/'
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
     }
