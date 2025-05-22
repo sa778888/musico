@@ -22,6 +22,17 @@ const nextConfig = {eslint: {
       },{
         protocol: 'https',
         hostname: 'www.theaudiodb.com',
+      },{
+        protocol: 'https',
+        hostname: '**.mzstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lastfm.freetls.fastly.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
       },
     ],
     domains: [
