@@ -10,42 +10,33 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Validate URL format
-    const url = new URL(imageUrl);
+    console.log('Proxying image:', imageUrl);
     
-    // Allowed domains for security
-    const allowedHosts = [
-      'lastfm.freetls.fastly.net',
-      'is1-ssl.mzstatic.com',
-      'is2-ssl.mzstatic.com', 
-      'is3-ssl.mzstatic.com',
-      'is4-ssl.mzstatic.com',
-      'is5-ssl.mzstatic.com',
-      'i.ytimg.com',
-      'img.youtube.com'
-    ];
-    
-    if (!allowedHosts.includes(url.hostname)) {
-      return new NextResponse('Domain not allowed', { status: 403 });
+    // Special handling for iTunes/Apple images
+    const headers: Record<string, string> = {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      'Accept': 'image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Sec-Fetch-Dest': 'image',
+      'Sec-Fetch-Mode': 'no-cors',
+      'Sec-Fetch-Site': 'cross-site'
+    };
+
+    // For iTunes images, add referer
+    if (imageUrl.includes('mzstatic.com')) {
+      headers['Referer'] = 'https://music.apple.com/';
     }
 
-    // Fetch with proper headers and timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-    
     const response = await fetch(imageUrl, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; MusicApp/1.0)',
-        'Accept': 'image/*',
-        'Cache-Control': 'no-cache'
-      }
+      headers,
+      signal: AbortSignal.timeout(10000) // 10 second timeout
     });
     
-    clearTimeout(timeoutId);
-    
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.error(`Image fetch failed: ${response.status} ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}`);
     }
     
     const contentType = response.headers.get('Content-Type');
@@ -54,6 +45,7 @@ export async function GET(request: NextRequest) {
     }
     
     const imageBuffer = await response.arrayBuffer();
+    console.log(`Successfully proxied image: ${imageBuffer.byteLength} bytes`);
     
     return new NextResponse(imageBuffer, {
       headers: {
@@ -66,15 +58,13 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Image proxy error:', error);
+    console.error('Image proxy error for URL:', imageUrl, error);
     
-    // Return a 1x1 transparent pixel as fallback
-    const transparentPixel = Buffer.from(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-      'base64'
-    );
+    // Return default image as base64
+    const defaultImageBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    const defaultImage = Buffer.from(defaultImageBase64, 'base64');
     
-    return new NextResponse(transparentPixel, {
+    return new NextResponse(defaultImage, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=60'
