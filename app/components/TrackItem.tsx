@@ -1,4 +1,3 @@
-// app/components/TrackItem.tsx
 'use client';
 
 import { useState } from 'react';
@@ -18,13 +17,13 @@ interface TrackItemProps {
 export default function TrackItem({ id, title, artist, thumbnail, listeners, index }: TrackItemProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handlePlay = async () => {
     setIsLoading(true);
     try {
       const videoId = await getYoutubeVideoId(artist, title);
       if (videoId) {
-        // Dispatch event to global player
         window.dispatchEvent(
           new CustomEvent('playTrack', {
             detail: {
@@ -41,6 +40,21 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
     }
   };
 
+  const getImageSrc = () => {
+    if (imageError || !thumbnail) {
+      return '/default-cover.png';
+    }
+    
+    // Use proxy in production for external images
+    if (process.env.NODE_ENV === 'production' && 
+        thumbnail.startsWith('http') && 
+        !thumbnail.includes('localhost')) {
+      return `/api/image-proxy?url=${encodeURIComponent(thumbnail)}`;
+    }
+    
+    return thumbnail;
+  };
+
   return (
     <div 
       className="grid grid-cols-[16px_4fr_2fr] md:grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 rounded-md group hover:bg-neutral-800/50 transition-colors"
@@ -53,6 +67,7 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
             onClick={handlePlay}
             disabled={isLoading}
             className="text-white"
+            aria-label={`Play ${title}`}
           >
             {isLoading ? (
               <div className="h-4 w-4 border-t-2 border-white rounded-full animate-spin" />
@@ -66,13 +81,15 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       </div>
       
       <div className="flex items-center gap-x-3">
-        <div className="relative min-h-[40px] min-w-[40px] h-10 w-10">
-         <img
-            src={thumbnail || '/default-cover.png'}
-            
+        <div className="relative h-10 w-10 flex-shrink-0">
+          <Image
+            src={getImageSrc()}
+            fill
             alt={title}
-            className="object-cover rounded w-full h-full"
-            sizes="40px"
+            className="object-cover rounded"
+            sizes="(max-width: 768px) 40px, 80px"
+            onError={() => setImageError(true)}
+            onLoad={() => setImageError(false)}
           />
         </div>
         <div className="flex flex-col overflow-hidden">
@@ -82,7 +99,7 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       </div>
       
       <div className="flex items-center text-neutral-400 text-sm">
-        {listeners && <p>{listeners.toLocaleString()} listeners</p>}
+        {listeners && <p>{listeners?.toLocaleString()} listeners</p>}
       </div>
       
       <div className="hidden md:flex items-center justify-end text-neutral-400 text-sm">
