@@ -20,6 +20,8 @@ export default function LoginPage() {
       })
 
        if (!res.ok) {
+        window.location.href = '/'
+
       let errorMessage = 'Login failed'
 
       try {
