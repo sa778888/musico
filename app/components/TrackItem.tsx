@@ -67,14 +67,13 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       
       <div className="flex items-center gap-x-3">
         <div className="relative min-h-[40px] min-w-[40px] h-10 w-10">
-         <Image
-  src={thumbnail || '/default-cover.png'}
-   width={40}
-    height={40}
-  alt={title}
-  className="object-cover rounded"
-  sizes="40px"
-/>
+         <img
+            src={thumbnail || '/default-cover.png'}
+            
+            alt={title}
+            className="object-cover rounded w-full h-full"
+            sizes="40px"
+          />
         </div>
         <div className="flex flex-col overflow-hidden">
           <p className="text-white truncate">{title}</p>
