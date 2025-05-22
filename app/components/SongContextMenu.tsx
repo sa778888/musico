@@ -2,12 +2,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Play, Heart, Plus, X } from 'lucide-react';
+import { Play, Heart, Plus} from 'lucide-react';
 import { useLikedSongs } from '@/app/context/LikedSongsContext';
-import AddToPlaylistMenu from './AddToPlaylistMenu';
+import AddToPlaylistMenu from './AddToPlaylist';
+import { Song } from '../types/track';
 
 interface SongContextMenuProps {
-  song: any;
+  song: Song;
   isOpen: boolean;
   onClose: () => void;
   position: { x: number; y: number };

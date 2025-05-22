@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { getYoutubeVideoId } from '../lib/youtubeSearch';
-import { Play, Pause, Clock } from 'lucide-react';
+import { Play, Clock } from 'lucide-react';
 import Image from 'next/image';
 
 interface TrackItemProps {

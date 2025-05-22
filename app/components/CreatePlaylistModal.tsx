@@ -52,6 +52,7 @@ export default function CreatePlaylistModal({ isOpen, onClose, onCreatePlaylist 
       setPlaylistName('');
       onClose();
     } catch (err) {
+      console.error(err);
       setError('Failed to create playlist. Please try again.');
     } finally {
       setIsLoading(false);

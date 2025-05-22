@@ -1,3 +1,4 @@
+
 // app/components/Player.tsx
 'use client';
 
@@ -10,6 +11,22 @@ import {
 import { useLikedSongs } from '../context/LikedSongsContext';
 import { Song } from '../context/LikedSongsContext';
 import { getYoutubeVideoId } from '../lib/youtubeSearch';
+import Image from 'next/image';
+
+
+interface PlayFromLikedDetail {
+  likedSongs: Song[];
+}
+
+interface PlayFromPlaylistDetail {
+  songs: Song[];
+}
+
+interface PlayTrackDetail {
+  track: Song;
+  videoId: string;
+}
+
 
 export default function Player() {
   // Renamed variable to avoid the naming conflict
@@ -62,11 +79,12 @@ export default function Player() {
     }
   }, [isInitialized]);
 
+  
   // Listen for playFromLikedSongs events - FIXED with timeout
   useEffect(() => {
-    const handlePlayFromLiked = (e: any) => {
+    const handlePlayFromLiked = (e: CustomEvent<PlayFromLikedDetail>) => {
       const songs = e.detail?.likedSongs || likedSongs;
-      
+      if(playlist && currentIndex){}
       if (songs.length === 0) return;
       
       // Store the liked songs list
@@ -99,11 +117,11 @@ export default function Player() {
     
     window.addEventListener('playFromLikedSongs', handlePlayFromLiked);
     return () => window.removeEventListener('playFromLikedSongs', handlePlayFromLiked);
-  }, [likedSongs]);
+  }, [likedSongs,currentIndex, playlist]);
 
   // Listen for playFromPlaylist events
   useEffect(() => {
-    const handlePlayFromPlaylist = (e: any) => {
+    const handlePlayFromPlaylist = (e: CustomEvent<PlayFromPlaylistDetail>) => {
       const songs = e.detail?.songs || [];
       
       if (songs.length === 0) return;
@@ -164,7 +182,7 @@ export default function Player() {
 
   // Listen for playTrack events from other components
   useEffect(() => {
-    const handler = (e: any) => {
+    const handler = (e: CustomEvent<PlayTrackDetail>) => {
       const { track, videoId: vid } = e.detail;
       const newSong = { ...track, videoId: vid };
 
@@ -315,7 +333,7 @@ export default function Player() {
 
   const onSeekDown = () => setSeeking(true);
 
-  const onSeekChange = (e: any) => setPlayed(parseFloat(e.target.value));
+  const onSeekChange = (e ) => setPlayed(parseFloat(e.target.value));
 
   const onSeekUp = () => {
     setSeeking(false);
@@ -459,7 +477,7 @@ export default function Player() {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Song info section */}
         <div className="flex items-center gap-3 w-1/4">
-          <img 
+          <Image  width={56} height={56}
             src={current.thumbnail} 
             className="h-14 w-14 rounded object-cover" 
             alt={current.title}
@@ -597,7 +615,7 @@ export default function Player() {
             playerRef.current?.getInternalPlayer()?.playVideo();
           }
         }}
-        config={{ youtube: { playerVars: { controls:0, disablekb:1 } } }}
+        config={{ playerVars: { controls:0, disablekb:1 }  }}
       />
     </div>
   );

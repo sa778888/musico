@@ -1,19 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { Home, Search, Library, PlusSquare, Heart, LogOut } from 'lucide-react';
+import { Home, Search, Library, Heart, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Sidebar() {
-  const [playlists, setPlaylists] = useState([
-    { id: '1', name: 'Chill Vibes' },
-    { id: '2', name: 'Workout Mix' },
-    { id: '3', name: 'Study Focus' },
-    { id: '4', name: 'Jazz & Blues' },
-    { id: '5', name: 'Coding Flow' },
-    { id: '6', name: 'Evening Relax' },
-    { id: '7', name: 'Party Hits' },
-  ]);
+  // const [playlists, setPlaylists] = useState([
+  //   { id: '1', name: 'Chill Vibes' },
+  //   { id: '2', name: 'Workout Mix' },
+  //   { id: '3', name: 'Study Focus' },
+  //   { id: '4', name: 'Jazz & Blues' },
+  //   { id: '5', name: 'Coding Flow' },
+  //   { id: '6', name: 'Evening Relax' },
+  //   { id: '7', name: 'Party Hits' },
+  // ]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', {

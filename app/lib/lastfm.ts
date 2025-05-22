@@ -10,6 +10,13 @@ export interface LastFMTrack {
   listeners?: number;
   url: string;
 }
+interface LastFMApiTrack {
+  name: string;
+  artist: string;
+  listeners: string;   // it's a string in the API
+  url: string;
+  mbid?: string;
+}
 
 export async function searchTracks(
   query: string,
@@ -30,7 +37,7 @@ export async function searchTracks(
   if (!Array.isArray(matches)) matches = [matches];
 
   return Promise.all(
-    matches.map(async (t: any) => {
+    (matches as LastFMApiTrack[]).map(async (t) => {
       const title = t.name;
       const artist = t.artist;
       const listeners = parseInt(t.listeners, 10) || 0;

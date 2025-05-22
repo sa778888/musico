@@ -5,6 +5,7 @@ import MusicSearch from './components/MusicSearch';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TopSongs from './components/TopSongs';
+import Image from 'next/image';
 
 export default function Home() {
   const [greeting, setGreeting] = useState('Good morning');
@@ -72,7 +73,7 @@ function Card({
       className={`cursor-pointer group transition transform hover:scale-[1.03] hover:shadow-lg rounded-xl overflow-hidden bg-gradient-to-br ${gradient}`}
     >
       <div className="flex items-center gap-4 p-4">
-        <img src={image} alt={title} className="h-16 w-16 object-cover rounded-md" />
+        <Image src={image} alt={title} width={128} height={128} className="h-16 w-16 object-cover rounded-md" />
         <p className="text-white font-semibold truncate">{title}</p>
       </div>
     </div>

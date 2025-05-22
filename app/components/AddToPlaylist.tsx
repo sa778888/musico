@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Check, Loader2, X } from 'lucide-react';
+import { Song } from '@prisma/client';
 
 interface Playlist {
   id: string;
@@ -10,7 +11,7 @@ interface Playlist {
 }
 
 interface AddToPlaylistMenuProps {
-  song: any;
+  song: Song;
   isOpen: boolean;
   onClose: () => void;
   anchorEl: HTMLElement | null;

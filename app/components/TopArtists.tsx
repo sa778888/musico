@@ -1,9 +1,9 @@
-// app/components/TopArtists.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Play, Loader2, User } from 'lucide-react';
 import { getYoutubeVideoId } from '@/app/lib/youtubeSearch';
+import Image from 'next/image';
 
 interface Artist {
   id: string;
@@ -23,7 +23,7 @@ export default function TopArtists() {
       try {
         const res = await fetch('/api/itunes/top-artists');
         if (!res.ok) throw new Error('Failed to fetch artists');
-        const data = await res.json();
+        const data: Artist[] = await res.json();
         setArtists(data);
       } catch (err) {
         console.error('Error loading artists:', err);
@@ -36,32 +36,34 @@ export default function TopArtists() {
     fetchArtists();
   }, []);
 
+  // Filter out duplicates by artist.id
+  const uniqueArtists = artists.filter(
+    (artist, index, self) =>
+      index === self.findIndex((a) => a.id === artist.id)
+  );
+
   const handlePlayArtist = async (artist: Artist) => {
     try {
       setPlayingId(artist.id);
-      
-      // Search for a popular song by this artist
-      const searchQuery = `${artist.name} popular song`;
+
       const videoId = await getYoutubeVideoId(artist.name, 'popular song');
-      
+
       if (!videoId) {
         throw new Error('No matching video found');
       }
-      
-      // Format the song data for your player
+
       const songData = {
         title: `Popular track by ${artist.name}`,
         artist: artist.name,
         thumbnail: artist.image,
-        videoId: videoId
+        videoId: videoId,
       };
-      
-      // Dispatch the playTrack event
+
       const event = new CustomEvent('playTrack', {
         detail: {
           track: songData,
-          videoId: videoId
-        }
+          videoId: videoId,
+        },
       });
       window.dispatchEvent(event);
     } catch (err) {
@@ -71,23 +73,25 @@ export default function TopArtists() {
     }
   };
 
-  if (loading) return (
-    <div className="p-8 flex items-center justify-center h-64">
-      <Loader2 className="animate-spin text-white h-8 w-8" />
-    </div>
-  );
-  
-  if (error) return (
-    <div className="p-8 text-red-500 text-center">
-      <p>{error}</p>
-      <button 
-        onClick={() => window.location.reload()}
-        className="mt-4 px-4 py-2 bg-white text-black rounded-full hover:bg-opacity-80"
-      >
-        Try Again
-      </button>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="p-8 flex items-center justify-center h-64">
+        <Loader2 className="animate-spin text-white h-8 w-8" />
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="p-8 text-red-500 text-center">
+        <p>{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-white text-black rounded-full hover:bg-opacity-80"
+        >
+          Try Again
+        </button>
+      </div>
+    );
 
   return (
     <div className="p-6">
@@ -98,14 +102,14 @@ export default function TopArtists() {
         <h3 className="text-2xl font-mono text-yellow-300 ">Tune in to the station</h3>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {artists.map((artist) => (
+        {uniqueArtists.map((artist, index) => (
           <div
-            key={artist.id}
+            key={`${artist.id}-${index}`}
             className="bg-neutral-800 rounded-lg p-4 transition-all duration-300 hover:bg-neutral-700 group"
           >
             <div className="relative aspect-square mb-4 shadow-lg">
               {artist.image ? (
-                <img
+                <Image width={200} height={200}
                   src={artist.image}
                   alt={artist.name}
                   className="object-cover w-full h-full rounded-full"
@@ -131,7 +135,7 @@ export default function TopArtists() {
                 </div>
               </button>
             </div>
-            
+
             <div className="text-center">
               <p className="font-semibold text-white truncate">{artist.name}</p>
               {artist.genre && (

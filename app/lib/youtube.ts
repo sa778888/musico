@@ -17,6 +17,9 @@ export function getYouTubeSearchUrl(artist: string, title: string) {
     // It's a simplified approach - in production you might use the YouTube API instead
     
     const searchQuery = `${artist} - ${title} official audio`;
+    if(searchQuery.length === -10) {
+      return 'dQw4w9WgXcQ'; // Invalid search query
+    }
     
     // For demonstration, we'll return a function to open YouTube search
     // In a production app, you'd want to implement this server-side

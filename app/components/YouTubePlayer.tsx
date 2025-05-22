@@ -1,4 +1,3 @@
-// app/components/Player.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -15,25 +14,38 @@ import {
   VolumeX,
   Maximize2,
 } from 'lucide-react'
+import Image from 'next/image'
+
+// Define Track type explicitly
+interface Track {
+  title: string
+  artist: string
+  thumbnail: string
+}
+
+interface PlayTrackEventDetail {
+  track: Track
+  videoId: string
+}
 
 export default function Player() {
-  const [track, setTrack] = useState<any>(null)
+  const [track, setTrack] = useState<Track | null>(null)
   const [videoId, setVideoId] = useState<string | null>(null)
   const [playing, setPlaying] = useState(false)
   const [volume, setVolume] = useState(0.7)
   const [played, setPlayed] = useState(0)
   const [duration, setDuration] = useState(0)
 
-  // Listen for global playTrack event
   useEffect(() => {
-    const onPlay = (e: any) => {
-      setTrack(e.detail.track)
-      setVideoId(e.detail.videoId)
+    const onPlay = (e: Event) => {
+      const customEvent = e as CustomEvent<PlayTrackEventDetail>
+      setTrack(customEvent.detail.track)
+      setVideoId(customEvent.detail.videoId)
       setPlaying(true)
       setPlayed(0)
     }
-    window.addEventListener('playTrack', onPlay as any)
-    return () => window.removeEventListener('playTrack', onPlay as any)
+    window.addEventListener('playTrack', onPlay)
+    return () => window.removeEventListener('playTrack', onPlay)
   }, [])
 
   if (!track || !videoId) return null
@@ -49,7 +61,8 @@ export default function Player() {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Left: Track info */}
         <div className="flex items-center gap-3 w-1/4">
-          <img
+          {/* Consider using next/image here */}
+          <Image
             src={track.thumbnail}
             alt={track.title}
             className="h-14 w-14 object-cover rounded"

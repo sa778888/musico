@@ -1,29 +1,35 @@
-'use client'
+"use client";
 
-import { useState } from 'react';
-import { useLikedSongs } from '../context/LikedSongsContext';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Heart, Play, Clock, Loader2, Shuffle } from 'lucide-react';
+import { useState } from "react";
+import { useLikedSongs } from "../context/LikedSongsContext";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Heart, Play, Clock, Loader2, Shuffle } from "lucide-react";
 
 export default function LikedPage() {
   const { liked, toggleLike, isLiked } = useLikedSongs();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  interface Song {
+    videoId: string;
+    title: string;
+    artist: string;
+    thumbnail: string;
+  }
 
   // Play a song
-  const playSong = (song: any) => {
+  const playSong = (song: Song) => {
     setCurrentlyPlaying(song.videoId);
-    const event = new CustomEvent('playTrack', {
+    const event = new CustomEvent("playTrack", {
       detail: {
         track: {
           title: song.title,
           artist: song.artist,
-          thumbnail: song.thumbnail
+          thumbnail: song.thumbnail,
         },
-        videoId: song.videoId
-      }
+        videoId: song.videoId,
+      },
     });
     window.dispatchEvent(event);
   };
@@ -31,18 +37,18 @@ export default function LikedPage() {
   // Dispatch event to player to play random songs from liked list only
   const playRandomSong = () => {
     if (liked.length === 0) return;
-    
+
     // Instead of playing directly, tell the player to use liked songs mode
-    const event = new CustomEvent('playFromLikedSongs', {
-      detail: { 
-        likedSongs: liked 
-      }
+    const event = new CustomEvent("playFromLikedSongs", {
+      detail: {
+        likedSongs: liked,
+      },
     });
     window.dispatchEvent(event);
   };
 
   // Handle like/unlike
-  const handleToggleLike = async (song: any, e: React.MouseEvent) => {
+  const handleToggleLike = async (song: Song, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering playSong
     setLoading(true);
     await toggleLike(song);
@@ -54,7 +60,7 @@ export default function LikedPage() {
       {/* Header */}
       <div className="flex items-end px-8 py-10 gap-6 bg-indigo-800/60 backdrop-blur-sm relative">
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push("/")}
           className="absolute top-6 left-6 text-white hover:text-neutral-300 transition"
         >
           <ArrowLeft className="h-6 w-6" />
@@ -71,8 +77,10 @@ export default function LikedPage() {
         <div className="flex flex-col">
           <p className="uppercase text-sm font-semibold">Playlist</p>
           <h1 className="text-5xl font-bold mt-1 mb-2">Liked Songs</h1>
-          <p className="text-sm text-neutral-300">{liked.length} {liked.length === 1 ? 'song' : 'songs'}</p>
-          
+          <p className="text-sm text-neutral-300">
+            {liked.length} {liked.length === 1 ? "song" : "songs"}
+          </p>
+
           {/* Shuffle Play Button */}
           {liked.length > 0 && (
             <button
@@ -108,7 +116,7 @@ export default function LikedPage() {
                 <Clock className="h-4 w-4" />
               </span>
             </div>
-            
+
             {/* Song List */}
             <ul className="divide-y divide-neutral-800/30">
               {liked.map((song, index) => (
@@ -119,12 +127,15 @@ export default function LikedPage() {
                 >
                   <div className="flex items-center w-6 text-neutral-400">
                     {currentlyPlaying === song.videoId ? (
-                      <Play className="h-4 w-4 text-green-500" fill="currentColor" />
+                      <Play
+                        className="h-4 w-4 text-green-500"
+                        fill="currentColor"
+                      />
                     ) : (
                       <span>{index + 1}</span>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="relative h-10 w-10 flex-shrink-0">
                       <Image
@@ -139,15 +150,19 @@ export default function LikedPage() {
                       </div>
                     </div>
                     <div className="truncate">
-                      <p className="truncate font-medium text-white">{song.title}</p>
-                      <p className="text-sm text-neutral-400 truncate md:hidden">{song.artist}</p>
+                      <p className="truncate font-medium text-white">
+                        {song.title}
+                      </p>
+                      <p className="text-sm text-neutral-400 truncate md:hidden">
+                        {song.artist}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="hidden md:block text-neutral-400 truncate self-center">
                     {song.artist}
                   </div>
-                  
+
                   <div className="flex items-center justify-end">
                     <button
                       onClick={(e) => handleToggleLike(song, e)}

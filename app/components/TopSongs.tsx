@@ -5,6 +5,7 @@ import { Play, Heart, Loader2 } from 'lucide-react';
 import { fetchCoverWithItunes } from '../lib/itunes';
 import { getYoutubeVideoId } from '@/app/lib/youtubeSearch';
 import { useLikedSongs } from '@/app/context/LikedSongsContext';
+import Image from 'next/image';
 
 interface Song {
   videoId?: string;
@@ -12,6 +13,15 @@ interface Song {
   artist: string;
   thumbnail: string;
   itunesId: string;
+}
+interface ItunesEntry {
+  'im:artist': { label: string };
+  'im:name': { label: string };
+  id: {
+    attributes: {
+      'im:id': string;
+    }
+  };
 }
 
 const PAGE_SIZE = 20;
@@ -31,7 +41,7 @@ export default function TopSongs() {
         const response = await fetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json');
         const data = await response.json();
 
-        const songsPromises = data.feed.entry.map(async (entry: any) => {
+        const songsPromises = data.feed.entry.map(async (entry: ItunesEntry) => {
           const artist = entry['im:artist'].label;
           const title = entry['im:name'].label;
           const itunesId = entry.id.attributes['im:id'];
@@ -117,7 +127,7 @@ export default function TopSongs() {
             className="bg-neutral-800 p-4 rounded-md hover:bg-neutral-700 transition group"
           >
             <div className="relative aspect-square mb-4">
-              <img
+              <Image width={200} height={200}
                 src={song.thumbnail}
                 alt={`${song.title} by ${song.artist}`}
                 className="object-cover w-full h-full rounded-md"

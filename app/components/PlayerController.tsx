@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import ReactPlayer from 'react-player/youtube';
 import { getYouTubeSearchUrl } from '../lib/youtube';
+import Image from 'next/image';
 
 interface PlayerControllerProps {
   track: {
@@ -37,7 +38,7 @@ export default function PlayerController({ track }: PlayerControllerProps) {
         {/* Track info */}
         <div className="flex items-center">
           {track.thumbnail && (
-            <img 
+            <Image 
               src={track.thumbnail} 
               alt={track.title}
               className="w-12 h-12 mr-4 object-cover rounded"
