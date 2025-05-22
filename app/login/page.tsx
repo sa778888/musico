@@ -20,9 +20,20 @@ export default function LoginPage() {
       })
 
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Login failed')
+        let errorMessage = 'Login failed'
+  
+        try {
+          const data = await res.json()
+          errorMessage = data.error || errorMessage
+          window.location.href = '/'
+
+        } catch (_) {
+          // The response wasn't JSON — ignore
+        }
+  
+        throw new Error(errorMessage)
       }
+  
 
       window.location.href = '/'
     } catch (err) {

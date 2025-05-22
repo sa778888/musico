@@ -38,7 +38,7 @@ export default function PlayerController({ track }: PlayerControllerProps) {
         {/* Track info */}
         <div className="flex items-center">
           {track.thumbnail && (
-            <Image 
+            <img 
               src={track.thumbnail} 
               alt={track.title}
               className="w-12 h-12 mr-4 object-cover rounded"

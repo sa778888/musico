@@ -1,7 +1,7 @@
 // app/api/auth/me/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '../../../lib/prisma'
-import { verifyToken } from '../../../lib/auth'
+import prisma from '@/app/lib/prisma'
+import { verifyToken } from '@/app/lib/auth'
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value

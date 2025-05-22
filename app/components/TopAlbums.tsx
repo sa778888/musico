@@ -1,10 +1,11 @@
-// app/components/TopAlbums.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, Heart, Loader2 } from 'lucide-react';
+import { Play, Heart, Loader2, ArrowLeft } from 'lucide-react';
 import { useLikedSongs } from '@/app/context/LikedSongsContext';
 import { getYoutubeVideoId } from '@/app/lib/youtubeSearch';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface Album {
   id: string;
@@ -21,6 +22,7 @@ export default function TopAlbums() {
   const [error, setError] = useState<string | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const { toggleLike, isLiked } = useLikedSongs();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchAlbums() {
@@ -75,6 +77,10 @@ export default function TopAlbums() {
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-96 text-white animate-pulse space-y-4">
       <Loader2 className="animate-spin w-8 h-8 text-green-500" />
@@ -96,10 +102,26 @@ export default function TopAlbums() {
 
   return (
     <div className="p-6">
+      {/* Back Button */}
+      <div className="mb-6">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors group"
+        >
+          <ArrowLeft 
+            size={20} 
+            className="transition-transform group-hover:-translate-x-1" 
+          />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
+
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">Top Albums</h2>
       </div>
       
+      {/* Albums Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {albums.map((album) => (
           <div
@@ -107,11 +129,17 @@ export default function TopAlbums() {
             className="bg-neutral-800 rounded-lg p-4 transition-all duration-300 hover:bg-neutral-700 group"
           >
             <div className="relative aspect-square mb-4 shadow-lg">
-              <img
+              <Image
                 src={album.artwork}
                 alt={`${album.title} by ${album.artist}`}
+                width={200}
+                height={200}
                 className="object-cover w-full h-full rounded-md"
                 loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = '/default-album-cover.jpg'; // Fallback image
+                }}
               />
               <button
                 onClick={() => handlePlay(album)}

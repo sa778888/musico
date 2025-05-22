@@ -67,7 +67,7 @@ export default function TrackItem({ id, title, artist, thumbnail, listeners, ind
       
       <div className="flex items-center gap-x-3">
         <div className="relative min-h-[40px] min-w-[40px] h-10 w-10">
-          <Image
+          <img
             src={thumbnail || '/default-cover.png'}
             fill
             alt={title}

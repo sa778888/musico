@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, Loader2, User } from 'lucide-react';
+import { Play, Loader2, User, ArrowLeft } from 'lucide-react';
 import { getYoutubeVideoId } from '@/app/lib/youtubeSearch';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 interface Artist {
@@ -17,6 +18,7 @@ export default function TopArtists() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchArtists() {
@@ -73,6 +75,10 @@ export default function TopArtists() {
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   if (loading)
     return (
       <div className="p-8 flex items-center justify-center h-64">
@@ -95,12 +101,30 @@ export default function TopArtists() {
 
   return (
     <div className="p-6">
+      {/* Back Button */}
+      <div className="mb-6">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors group"
+        >
+          <ArrowLeft 
+            size={20} 
+            className="transition-transform group-hover:-translate-x-1" 
+          />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
+
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white">Top Artists</h2>
       </div>
+      
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-mono text-yellow-300 ">Tune in to the station</h3>
+        <h3 className="text-2xl font-mono text-yellow-300">Tune in to the station</h3>
       </div>
+
+      {/* Artists Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {uniqueArtists.map((artist, index) => (
           <div
@@ -109,9 +133,11 @@ export default function TopArtists() {
           >
             <div className="relative aspect-square mb-4 shadow-lg">
               {artist.image ? (
-                <Image width={200} height={200}
+                <Image 
                   src={artist.image}
                   alt={artist.name}
+                  width={200}
+                  height={200}
                   className="object-cover w-full h-full rounded-full"
                   loading="lazy"
                 />

@@ -127,7 +127,7 @@ export default function TopSongs() {
             className="bg-neutral-800 p-4 rounded-md hover:bg-neutral-700 transition group"
           >
             <div className="relative aspect-square mb-4">
-              <Image width={200} height={200}
+              <img
                 src={song.thumbnail}
                 alt={`${song.title} by ${song.artist}`}
                 className="object-cover w-full h-full rounded-md"
