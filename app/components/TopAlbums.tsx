@@ -128,11 +128,10 @@ export default function TopAlbums() {
             className="bg-neutral-800 rounded-lg p-4 transition-all duration-300 hover:bg-neutral-700 group"
           >
             <div className="relative aspect-square mb-4 shadow-lg">
-              <Image
+              <img
                 src={album.artwork}
                 alt={`${album.title} by ${album.artist}`}
-                width={200}
-                height={200}
+                
                 className="object-cover w-full h-full rounded-md"
                 loading="lazy"
                 onError={(e) => {
