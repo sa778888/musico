@@ -1,17 +1,17 @@
 # 🎵 Musico – Free Song Streaming App
 
-Musico is a **free and open-source music streaming app** that allows users to search, stream, and enjoy their favorite tracks seamlessly. Powered by YouTube, this app brings a simple and clean user experience, delivering high-quality music playback with minimal setup.
+Musico is a **free and open-source music streaming app** that allows users to search, stream, and enjoy their favorite tracks seamlessly and free. 
 
 ---
 visit at : https://musico-eight.vercel.app/
 ## 🚀 Features
 
 - 🔍 **Search for Songs** by title and artist  
-- ▶️ **Stream Music** directly from YouTube  
+- ▶️ **Stream Music** for free unlimited  
 - 🖼️ Dynamic **thumbnails and metadata** for tracks  
-- 🎧 Listener count display  
-- 📱 Fully responsive design  
-- 📦 Easily exportable to a mobile app via Capacitor
+- 🎧 Liked Song playlist  
+- 📱 Huge library   
+
 
 ---
 
@@ -20,7 +20,6 @@ visit at : https://musico-eight.vercel.app/
 - **Next.js** (App Router)
 - **TailwindCSS**
 - **Lucide React Icons**
-- **YouTube Data API**
 - **TypeScript**
 
 ---
