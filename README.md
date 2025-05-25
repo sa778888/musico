@@ -1,4 +1,4 @@
-# 🎵 Musico – Free Song Streaming App
+# 🎵 Musico – Unlimited Free Song Streaming App
 
 Musico is a **free and open-source music streaming app** that allows users to search, stream, and enjoy their favorite tracks seamlessly and free. 
 
